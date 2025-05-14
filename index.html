@@ -1,0 +1,982 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CyberShield | Защита от доксинга и сватов</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Oxanium:wght@300;400;500;600;700&family=Roboto+Mono:wght@300;400;500&display=swap');
+        
+        :root {
+            --primary: #6e48aa;
+            --secondary: #9d50bb;
+            --dark: #1a1a2e;
+            --light: #f8f9fa;
+            --cyber: #00ff9d;
+        }
+        
+        body {
+            font-family: 'Roboto Mono', monospace;
+            background-color: var(--dark);
+            color: var(--light);
+            overflow-x: hidden;
+        }
+        
+        .title-font {
+            font-family: 'Oxanium', cursive;
+        }
+        
+        .cyber-text {
+            color: var(--cyber);
+            text-shadow: 0 0 5px rgba(0, 255, 157, 0.5);
+        }
+        
+        .cyber-border {
+            border: 1px solid var(--cyber);
+            box-shadow: 0 0 10px rgba(0, 255, 157, 0.3);
+        }
+        
+        .hero {
+            background: linear-gradient(135deg, var(--dark) 0%, var(--primary) 100%);
+            min-height: 90vh;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(circle at 20% 30%, rgba(0, 255, 157, 0.1) 0%, transparent 20%),
+                radial-gradient(circle at 80% 70%, rgba(110, 72, 170, 0.2) 0%, transparent 25%);
+            z-index: 1;
+        }
+        
+        .cyber-grid {
+            background-image: 
+                linear-gradient(rgba(0, 255, 157, 0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 255, 157, 0.05) 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+        
+        .service-card {
+            transition: all 0.3s ease;
+            background: rgba(26, 26, 46, 0.7);
+            backdrop-filter: blur(10px);
+        }
+        
+        .service-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 10px 25px -5px rgba(0, 255, 157, 0.2);
+        }
+        
+        .glow-effect {
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+        
+        @keyframes glow {
+            from {
+                box-shadow: 0 0 5px rgba(0, 255, 157, 0.5);
+            }
+            to {
+                box-shadow: 0 0 20px rgba(0, 255, 157, 0.8);
+            }
+        }
+        
+        .terminal {
+            background-color: rgba(10, 10, 20, 0.8);
+            border-radius: 5px;
+            font-family: 'Roboto Mono', monospace;
+            position: relative;
+        }
+        
+        .terminal::before {
+            content: '';
+            position: absolute;
+            top: 7px;
+            left: 10px;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #ff5f56;
+            box-shadow: 20px 0 0 #ffbd2e, 40px 0 0 #27c93f;
+        }
+        
+        .terminal-content {
+            padding: 30px 15px 15px;
+            overflow-x: auto;
+        }
+        
+        .command {
+            color: var(--cyber);
+        }
+        
+        .comment {
+            color: #6a737d;
+        }
+        
+        .floating-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            z-index: 100;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+        
+        .matrix-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0.1;
+            z-index: 0;
+            overflow: hidden;
+        }
+        
+        .matrix-column {
+            position: relative;
+            float: left;
+            width: 2%;
+            height: 100%;
+        }
+        
+        .matrix-char {
+            color: var(--cyber);
+            font-size: 16px;
+            writing-mode: vertical-rl;
+            text-orientation: mixed;
+            animation: matrix-fall 10s linear infinite;
+            animation-delay: calc(var(--delay) * 1s);
+        }
+        
+        @keyframes matrix-fall {
+            0% {
+                transform: translateY(-100%);
+                opacity: 0;
+            }
+            5% {
+                opacity: 1;
+            }
+            80% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(100vh);
+                opacity: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Matrix Background Animation -->
+    <div class="matrix-bg hidden md:block" id="matrix-bg"></div>
+
+    <!-- Navigation -->
+    <nav class="bg-black bg-opacity-80 backdrop-filter backdrop-blur-lg fixed w-full z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-20 items-center">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0 flex items-center">
+                        <i class="fas fa-shield-alt text-2xl cyber-text mr-2"></i>
+                        <span class="text-xl font-bold text-white title-font">Cyber<span class="cyber-text">Shield</span></span>
+                    </div>
+                </div>
+                <div class="hidden md:block">
+                    <div class="ml-10 flex items-baseline space-x-8">
+                        <a href="#home" class="text-gray-300 hover:text-white px-3 py-2 text-sm font-medium">Главная</a>
+                        <a href="#services" class="text-gray-300 hover:text-white px-3 py-2 text-sm font-medium">Услуги</a>
+                        <a href="#protection" class="text-gray-300 hover:text-white px-3 py-2 text-sm font-medium">Защита</a>
+                        <a href="#about" class="text-gray-300 hover:text-white px-3 py-2 text-sm font-medium">Обо мне</a>
+                        <a href="#testimonials" class="text-gray-300 hover:text-white px-3 py-2 text-sm font-medium">Отзывы</a>
+                        <a href="#contact" class="text-gray-300 hover:text-white px-3 py-2 text-sm font-medium">Контакты</a>
+                    </div>
+                </div>
+                <div class="md:hidden">
+                    <button id="mobile-menu-button" class="text-gray-300 hover:text-white focus:outline-none">
+                        <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Mobile menu -->
+        <div id="mobile-menu" class="hidden md:hidden bg-black bg-opacity-90 backdrop-filter backdrop-blur-lg">
+            <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+                <a href="#home" class="block px-3 py-2 text-base font-medium text-gray-300 hover:text-white">Главная</a>
+                <a href="#services" class="block px-3 py-2 text-base font-medium text-gray-300 hover:text-white">Услуги</a>
+                <a href="#protection" class="block px-3 py-2 text-base font-medium text-gray-300 hover:text-white">Защита</a>
+                <a href="#about" class="block px-3 py-2 text-base font-medium text-gray-300 hover:text-white">Обо мне</a>
+                <a href="#testimonials" class="block px-3 py-2 text-base font-medium text-gray-300 hover:text-white">Отзывы</a>
+                <a href="#contact" class="block px-3 py-2 text-base font-medium text-gray-300 hover:text-white">Контакты</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section id="home" class="hero pt-20 flex items-center justify-center">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-24 relative z-10">
+            <div class="md:flex items-center justify-between">
+                <div class="md:w-1/2 mb-10 md:mb-0">
+                    <h1 class="text-4xl md:text-6xl font-bold text-white title-font mb-6">Защита от <span class="cyber-text">доксинга</span> и <span class="cyber-text">сватов</span></h1>
+                    <p class="text-xl text-gray-300 mb-8">Профессиональная помощь в удалении личной информации из сети и защите от киберпреследования</p>
+                    <div class="flex flex-wrap gap-4">
+                        <a href="#contact" class="cyber-border bg-transparent text-white font-bold py-3 px-8 rounded-full hover:bg-cyan-900 hover:bg-opacity-30 transition duration-300 glow-effect">Экстренная помощь</a>
+                        <a href="#services" class="bg-white text-gray-900 font-bold py-3 px-8 rounded-full hover:bg-gray-200 transition duration-300">Мои услуги</a>
+                    </div>
+                </div>
+                <div class="md:w-1/2 relative">
+                    <div class="terminal max-w-md mx-auto">
+                        <div class="terminal-content">
+                            <p><span class="command">$ whoami</span></p>
+                            <p class="mb-4">CyberSecurity Expert | Anti-Dox Specialist</p>
+                            
+                            <p><span class="command">$ services --list</span></p>
+                            <ul class="list-disc list-inside mb-4">
+                                <li>Удаление персональных данных</li>
+                                <li>Защита от доксинга</li>
+                                <li>Борьба со сватами</li>
+                                <li>Цифровая гигиена</li>
+                                <li>Кибербезопасность</li>
+                            </ul>
+                            
+                            <p><span class="command">$ contact --now</span></p>
+                            <p class="comment">// Используйте кнопку ниже для связи</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Services Section -->
+    <section id="services" class="py-20 cyber-grid">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl md:text-4xl font-bold text-white title-font mb-4">Мои <span class="cyber-text">услуги</span></h2>
+                <div class="w-20 h-1 bg-gradient-to-r from-cyan-500 to-purple-500 mx-auto mb-6"></div>
+                <p class="text-lg text-gray-400 max-w-2xl mx-auto">Комплексные решения для защиты вашей цифровой приватности</p>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Service 1 -->
+                <div class="service-card cyber-border rounded-lg p-6">
+                    <div class="flex items-center mb-4">
+                        <div class="bg-cyan-900 bg-opacity-30 p-3 rounded-full mr-4">
+                            <i class="fas fa-search-minus cyber-text text-xl"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-white">Удаление персональных данных</h3>
+                    </div>
+                    <p class="text-gray-400 mb-4">Поиск и удаление вашей личной информации из публичных источников, форумов, соцсетей и баз данных</p>
+                    <div class="flex justify-between items-center">
+                        <span class="cyber-text font-bold text-lg">от 15 000₽</span>
+                        <button class="text-cyan-400 hover:text-cyan-300 font-medium">Подробнее →</button>
+                    </div>
+                </div>
+                
+                <!-- Service 2 -->
+                <div class="service-card cyber-border rounded-lg p-6">
+                    <div class="flex items-center mb-4">
+                        <div class="bg-cyan-900 bg-opacity-30 p-3 rounded-full mr-4">
+                            <i class="fas fa-user-shield cyber-text text-xl"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-white">Защита от доксинга</h3>
+                    </div>
+                    <p class="text-gray-400 mb-4">Комплекс мер по предотвращению утечки личных данных и защите от киберпреследования</p>
+                    <div class="flex justify-between items-center">
+                        <span class="cyber-text font-bold text-lg">от 25 000₽</span>
+                        <button class="text-cyan-400 hover:text-cyan-300 font-medium">Подробнее →</button>
+                    </div>
+                </div>
+                
+                <!-- Service 3 -->
+                <div class="service-card cyber-border rounded-lg p-6">
+                    <div class="flex items-center mb-4">
+                        <div class="bg-cyan-900 bg-opacity-30 p-3 rounded-full mr-4">
+                            <i class="fas fa-skull-crossbones cyber-text text-xl"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-white">Борьба со сватами</h3>
+                    </div>
+                    <p class="text-gray-400 mb-4">Защита от шантажа, компромата и "сватов" в интернете, включая юридическое сопровождение</p>
+                    <div class="flex justify-between items-center">
+                        <span class="cyber-text font-bold text-lg">от 35 000₽</span>
+                        <button class="text-cyan-400 hover:text-cyan-300 font-medium">Подробнее →</button>
+                    </div>
+                </div>
+                
+                <!-- Service 4 -->
+                <div class="service-card cyber-border rounded-lg p-6">
+                    <div class="flex items-center mb-4">
+                        <div class="bg-cyan-900 bg-opacity-30 p-3 rounded-full mr-4">
+                            <i class="fas fa-lock cyber-text text-xl"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-white">Цифровая гигиена</h3>
+                    </div>
+                    <p class="text-gray-400 mb-4">Аудит цифрового следа и обучение безопасному поведению в интернете</p>
+                    <div class="flex justify-between items-center">
+                        <span class="cyber-text font-bold text-lg">от 20 000₽</span>
+                        <button class="text-cyan-400 hover:text-cyan-300 font-medium">Подробнее →</button>
+                    </div>
+                </div>
+                
+                <!-- Service 5 -->
+                <div class="service-card cyber-border rounded-lg p-6">
+                    <div class="flex items-center mb-4">
+                        <div class="bg-cyan-900 bg-opacity-30 p-3 rounded-full mr-4">
+                            <i class="fas fa-key cyber-text text-xl"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-white">Кибербезопасность</h3>
+                    </div>
+                    <p class="text-gray-400 mb-4">Защита аккаунтов, настройка приватности, VPN и другие меры кибербезопасности</p>
+                    <div class="flex justify-between items-center">
+                        <span class="cyber-text font-bold text-lg">от 30 000₽</span>
+                        <button class="text-cyan-400 hover:text-cyan-300 font-medium">Подробнее →</button>
+                    </div>
+                </div>
+                
+                <!-- Service 6 -->
+                <div class="service-card cyber-border rounded-lg p-6">
+                    <div class="flex items-center mb-4">
+                        <div class="bg-cyan-900 bg-opacity-30 p-3 rounded-full mr-4">
+                            <i class="fas fa-gavel cyber-text text-xl"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-white">Юридическая поддержка</h3>
+                    </div>
+                    <p class="text-gray-400 mb-4">Помощь в подаче заявлений в правоохранительные органы и судебные иски</p>
+                    <div class="flex justify-between items-center">
+                        <span class="cyber-text font-bold text-lg">от 40 000₽</span>
+                        <button class="text-cyan-400 hover:text-cyan-300 font-medium">Подробнее →</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Protection Section -->
+    <section id="protection" class="py-20 bg-black bg-opacity-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl md:text-4xl font-bold text-white title-font mb-4">Как я <span class="cyber-text">защищаю</span> вас</h2>
+                <div class="w-20 h-1 bg-gradient-to-r from-cyan-500 to-purple-500 mx-auto mb-6"></div>
+                <p class="text-lg text-gray-400 max-w-2xl mx-auto">Пошаговый процесс работы по удалению данных и защите от угроз</p>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <!-- Step 1 -->
+                <div class="bg-gray-900 bg-opacity-70 p-6 rounded-lg cyber-border">
+                    <div class="text-4xl cyber-text font-bold mb-4">01</div>
+                    <h3 class="text-xl font-bold text-white mb-3">Анализ угроз</h3>
+                    <p class="text-gray-400">Полная диагностика вашей ситуации, поиск всех утечек информации и оценка рисков</p>
+                </div>
+                
+                <!-- Step 2 -->
+                <div class="bg-gray-900 bg-opacity-70 p-6 rounded-lg cyber-border">
+                    <div class="text-4xl cyber-text font-bold mb-4">02</div>
+                    <h3 class="text-xl font-bold text-white mb-3">Удаление данных</h3>
+                    <p class="text-gray-400">Поиск и удаление вашей личной информации из всех доступных источников</p>
+                </div>
+                
+                <!-- Step 3 -->
+                <div class="bg-gray-900 bg-opacity-70 p-6 rounded-lg cyber-border">
+                    <div class="text-4xl cyber-text font-bold mb-4">03</div>
+                    <h3 class="text-xl font-bold text-white mb-3">Защита аккаунтов</h3>
+                    <p class="text-gray-400">Усиление безопасности всех ваших учетных записей и соцсетей</p>
+                </div>
+                
+                <!-- Step 4 -->
+                <div class="bg-gray-900 bg-opacity-70 p-6 rounded-lg cyber-border">
+                    <div class="text-4xl cyber-text font-bold mb-4">04</div>
+                    <h3 class="text-xl font-bold text-white mb-3">Юридические меры</h3>
+                    <p class="text-gray-400">Подача жалоб, заявлений в правоохранительные органы и судебные иски</p>
+                </div>
+            </div>
+            
+            <div class="mt-16 bg-gray-900 bg-opacity-70 rounded-lg cyber-border p-8">
+                <h3 class="text-2xl font-bold text-white mb-4 text-center">Экстренная помощь при доксинге</h3>
+                <p class="text-gray-400 text-center max-w-3xl mx-auto mb-6">Если ваши данные уже слили в сеть и вам угрожают, действуйте немедленно. Я предоставляю срочные услуги по удалению информации и защите от дальнейших утечек.</p>
+                <div class="text-center">
+                    <a href="#contact" class="inline-block cyber-border bg-transparent text-white font-bold py-3 px-8 rounded-full hover:bg-cyan-900 hover:bg-opacity-30 transition duration-300 glow-effect">Срочная помощь</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="py-20 cyber-grid">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="md:flex items-center">
+                <div class="md:w-1/2 mb-10 md:mb-0 md:pr-10">
+                    <div class="bg-gray-900 bg-opacity-70 p-8 rounded-lg cyber-border">
+                        <h2 class="text-3xl md:text-4xl font-bold text-white title-font mb-6">Обо <span class="cyber-text">мне</span></h2>
+                        <div class="w-20 h-1 bg-gradient-to-r from-cyan-500 to-purple-500 mb-6"></div>
+                        <p class="text-gray-400 mb-6">Я известен как Лавинов в телеграмме. Cайт сделан для меня потому что помог очень многим людям, помогал в трудных ситуациях, есть фейм, известен в теме осинта(докса) очень узнаваемый.</p>
+                        <p class="text-gray-400 mb-6">Я работал с сотнями случаев доксинга, шантажа и киберпреследования, помогая клиентам восстановить контроль над своей приватностью.</p>
+                        <p class="text-gray-400 mb-8">Мои методы сочетают технические решения с юридическими мерами для максимально эффективной защиты.</p>
+                        
+                        <div class="grid grid-cols-2 gap-6 mb-8">
+                            <div class="flex items-center">
+                                <div class="bg-cyan-900 bg-opacity-30 p-2 rounded-full mr-3">
+                                    <i class="fas fa-check cyber-text"></i>
+                                </div>
+                                <span class="text-gray-300">7+ лет опыта</span>
+                            </div>
+                            <div class="flex items-center">
+                                <div class="bg-cyan-900 bg-opacity-30 p-2 rounded-full mr-3">
+                                    <i class="fas fa-check cyber-text"></i>
+                                </div>
+                                <span class="text-gray-300">500+ случаев</span>
+                            </div>
+                            <div class="flex items-center">
+                                <div class="bg-cyan-900 bg-opacity-30 p-2 rounded-full mr-3">
+                                    <i class="fas fa-check cyber-text"></i>
+                                </div>
+                                <span class="text-gray-300">Конфиденциальность</span>
+                            </div>
+                            <div class="flex items-center">
+                                <div class="bg-cyan-900 bg-opacity-30 p-2 rounded-full mr-3">
+                                    <i class="fas fa-check cyber-text"></i>
+                                </div>
+                                <span class="text-gray-300">Гарантии</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="md:w-1/2">
+                    <div class="bg-gray-900 bg-opacity-70 p-8 rounded-lg cyber-border">
+                        <h3 class="text-2xl font-bold text-white mb-6">Почему <span class="cyber-text">обращаются</span> ко мне</h3>
+                        <div class="space-y-6">
+                            <!-- Reason 1 -->
+                            <div class="flex">
+                                <div class="bg-cyan-900 bg-opacity-30 p-3 rounded-full h-12 w-12 flex items-center justify-center mr-4 flex-shrink-0">
+                                    <i class="fas fa-user-secret cyber-text"></i>
+                                </div>
+                                <div>
+                                    <h4 class="text-lg font-bold text-white mb-2">Анонимность</h4>
+                                    <p class="text-gray-400">Все данные клиентов защищены, работаем через зашифрованные каналы связи</p>
+                                </div>
+                            </div>
+                            
+                            <!-- Reason 2 -->
+                            <div class="flex">
+                                <div class="bg-cyan-900 bg-opacity-30 p-3 rounded-full h-12 w-12 flex items-center justify-center mr-4 flex-shrink-0">
+                                    <i class="fas fa-tools cyber-text"></i>
+                                </div>
+                                <div>
+                                    <h4 class="text-lg font-bold text-white mb-2">Комплексный подход</h4>
+                                    <p class="text-gray-400">Сочетаю технические, юридические и психологические методы защиты</p>
+                                </div>
+                            </div>
+                            
+                            <!-- Reason 3 -->
+                            <div class="flex">
+                                <div class="bg-cyan-900 bg-opacity-30 p-3 rounded-full h-12 w-12 flex items-center justify-center mr-4 flex-shrink-0">
+                                    <i class="fas fa-balance-scale cyber-text"></i>
+                                </div>
+                                <div>
+                                    <h4 class="text-lg font-bold text-white mb-2">Юридическая поддержка</h4>
+                                    <p class="text-gray-400">Помогаю с подачей заявлений в полицию и судебными исками</p>
+                                </div>
+                            </div>
+                            
+                            <!-- Reason 4 -->
+                            <div class="flex">
+                                <div class="bg-cyan-900 bg-opacity-30 p-3 rounded-full h-12 w-12 flex items-center justify-center mr-4 flex-shrink-0">
+                                    <i class="fas fa-headset cyber-text"></i>
+                                </div>
+                                <div>
+                                    <h4 class="text-lg font-bold text-white mb-2">Поддержка 24/7</h4>
+                                    <p class="text-gray-400">Экстренная помощь в любое время суток при критических ситуациях</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials Section -->
+    <section id="testimonials" class="py-20 bg-black bg-opacity-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl md:text-4xl font-bold text-white title-font mb-4">Отзывы <span class="cyber-text">клиентов</span></h2>
+                <div class="w-20 h-1 bg-gradient-to-r from-cyan-500 to-purple-500 mx-auto mb-6"></div>
+                <p class="text-lg text-gray-400 max-w-2xl mx-auto">Что говорят люди, которым я помог защитить свою приватность</p>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Testimonial 1 -->
+                <div class="bg-gray-900 bg-opacity-70 p-8 rounded-lg cyber-border">
+                    <div class="flex items-center mb-4">
+                        <div class="w-12 h-12 rounded-full bg-cyan-900 bg-opacity-30 flex items-center justify-center mr-4">
+                            <i class="fas fa-user cyber-text"></i>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-white">XXX, 17 лет</h4>
+                            <div class="flex text-yellow-400">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="text-gray-300">"После расставания бывший парень начал угрожать тем, что выложит мои интимные фото в сеть. Лавинов помог не только удалить уже опубликованные материалы, но и предотвратить дальнейшие утечки. Сейчас я чувствую себя в безопасности."</p>
+                </div>
+                
+                <!-- Testimonial 2 -->
+                <div class="bg-gray-900 bg-opacity-70 p-8 rounded-lg cyber-border">
+                    <div class="flex items-center mb-4">
+                        <div class="w-12 h-12 rounded-full bg-cyan-900 bg-opacity-30 flex items-center justify-center mr-4">
+                            <i class="fas fa-user cyber-text"></i>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-white">XXX, 21 лет</h4>
+                            <div class="flex text-yellow-400">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="text-gray-300">"Мои персональные данные, включая адрес и телефон, оказались в руках доксеров. Лавинов оперативно нашел все источники утечки и помог удалить информацию. Также настроил мои аккаунты для максимальной защиты."</p>
+                </div>
+                
+                <!-- Testimonial 3 -->
+                <div class="bg-gray-900 bg-opacity-70 p-8 rounded-lg cyber-border">
+                    <div class="flex items-center mb-4">
+                        <div class="w-12 h-12 rounded-full bg-cyan-900 bg-opacity-30 flex items-center justify-center mr-4">
+                            <i class="fas fa-user cyber-text"></i>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-white">XXX, 15 года</h4>
+                            <div class="flex text-yellow-400">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="text-gray-300">"Столкнулась с шантажом в интернете - требовали деньги, угрожая слить все данные. Благодаря Лавинову удалось не только остановить шантажистов, но и привлечь их к ответственности. Очень профессиональный подход!"</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="py-20 cyber-grid">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl md:text-4xl font-bold text-white title-font mb-4">Свяжитесь <span class="cyber-text">со мной</span></h2>
+                <div class="w-20 h-1 bg-gradient-to-r from-cyan-500 to-purple-500 mx-auto mb-6"></div>
+                <p class="text-lg text-gray-400 max-w-2xl mx-auto">Заполните форму ниже или используйте альтернативные способы связи</p>
+            </div>
+            
+            <div class="md:flex">
+                <div class="md:w-1/2 mb-10 md:mb-0 md:pr-10">
+                    <form class="space-y-6">
+                        <div>
+                            <label for="name" class="block text-gray-300 font-medium mb-2">Как к вам обращаться?</label>
+                            <input type="text" id="name" class="w-full px-4 py-3 bg-gray-900 bg-opacity-70 border border-gray-700 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 outline-none transition duration-300 text-white" placeholder="Ваше имя или псевдоним">
+                        </div>
+                        
+                        <div>
+                            <label for="contact-method" class="block text-gray-300 font-medium mb-2">Как вам удобнее получить ответ?</label>
+                            <select id="contact-method" class="w-full px-4 py-3 bg-gray-900 bg-opacity-70 border border-gray-700 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 outline-none transition duration-300 text-white">
+                                <option value="">Выберите способ связи</option>
+                                <option value="telegram">Telegram</option>
+                                <option value="email">Email</option>
+                                <option value="signal">Signal</option>
+                                <option value="other">Другое</option>
+                            </select>
+                        </div>
+                        
+                        <div id="contact-details" class="hidden">
+                            <label for="details" class="block text-gray-300 font-medium mb-2">Ваши контактные данные</label>
+                            <input type="text" id="details" class="w-full px-4 py-3 bg-gray-900 bg-opacity-70 border border-gray-700 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 outline-none transition duration-300 text-white" placeholder="@username или email">
+                        </div>
+                        
+                        <div>
+                            <label for="problem" class="block text-gray-300 font-medium mb-2">Опишите вашу проблему</label>
+                            <select id="problem" class="w-full px-4 py-3 bg-gray-900 bg-opacity-70 border border-gray-700 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 outline-none transition duration-300 text-white">
+                                <option value="">Выберите тип проблемы</option>
+                                <option value="doxing">Доксинг (слив личных данных)</option>
+                                <option value="blackmail">Шантаж/угрозы</option>
+                                <option value="swatting">Угроза сватов</option>
+                                <option value="other">Другое</option>
+                            </select>
+                        </div>
+                        
+                        <div>
+                            <label for="message" class="block text-gray-300 font-medium mb-2">Подробности ситуации</label>
+                            <textarea id="message" rows="4" class="w-full px-4 py-3 bg-gray-900 bg-opacity-70 border border-gray-700 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 outline-none transition duration-300 text-white" placeholder="Опишите ситуацию как можно подробнее"></textarea>
+                        </div>
+                        
+                        <div class="flex items-center">
+                            <input id="privacy" type="checkbox" class="w-4 h-4 bg-gray-900 border-gray-700 rounded focus:ring-cyan-500">
+                            <label for="privacy" class="ml-2 text-sm text-gray-400">Я согласен с политикой конфиденциальности</label>
+                        </div>
+                        
+                        <button type="submit" class="w-full cyber-border bg-transparent text-white font-bold py-4 px-6 rounded-lg hover:bg-cyan-900 hover:bg-opacity-30 transition duration-300 glow-effect">Отправить заявку</button>
+                    </form>
+                </div>
+                
+                <div class="md:w-1/2 md:pl-10">
+                    <div class="bg-gray-900 bg-opacity-70 p-8 rounded-lg cyber-border h-full">
+                        <h3 class="text-2xl font-bold text-white mb-6">Альтернативные <span class="cyber-text">способы</span> связи</h3>
+                        
+                        <div class="space-y-6">
+                            <div class="flex items-start">
+                                <div class="bg-cyan-900 bg-opacity-30 p-3 rounded-full mr-4">
+                                    <i class="fab fa-telegram cyber-text"></i>
+                                </div>
+                                <div>
+                                    <h4 class="font-bold text-white mb-1">Telegram</h4>
+                                    <p class="text-gray-400">@Vklavinov</p>
+                                    <p class="text-gray-400 text-sm mt-1">Самый быстрый способ связи. Используйте секретный чат для конфиденциальности.</p>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-start">
+                                <div class="bg-cyan-900 bg-opacity-30 p-3 rounded-full mr-4">
+                                    <i class="fas fa-envelope cyber-text"></i>
+                                </div>
+                                <div>
+                                    <h4 class="font-bold text-white mb-1">Secure Email</h4>
+                                    <p class="text-gray-400">contactLavinov@mail.ru</p>
+                                    <p class="text-gray-400 text-sm mt-1">PGP ключ доступен по запросу для шифрованной переписки.</p>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-start">
+                                <div class="bg-cyan-900 bg-opacity-30 p-3 rounded-full mr-4">
+                                    <i class="fab fa-signal cyber-text"></i>
+                                </div>
+                                <div>
+                                    <h4 class="font-bold text-white mb-1">Signal</h4>
+                                    <p class="text-gray-400">+7 (XXX) XXX-XX-XX</p>
+                                    <p class="text-gray-400 text-sm mt-1">Номер предоставляется после первичной проверки.</p>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-start">
+                                <div class="bg-cyan-900 bg-opacity-30 p-3 rounded-full mr-4">
+                                    <i class="fas fa-lock cyber-text"></i>
+                                </div>
+                                <div>
+                                    <h4 class="font-bold text-white mb-1">Конфиденциальность</h4>
+                                    <p class="text-gray-400">Ваши данные в безопасности</p>
+                                    <p class="text-gray-400 text-sm mt-1">Все обращения обрабатываются анонимно, данные не хранятся дольше необходимого.</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-8 pt-6 border-t border-gray-800">
+                            <h4 class="font-bold text-white mb-4">Экстренные случаи</h4>
+                            <p class="text-gray-400 mb-4">Если ваши данные уже опубликованы и вам угрожают, напишите "СРОЧНО" в начале сообщения в Telegram.</p>
+                            <div class="bg-red-900 bg-opacity-20 p-4 rounded-lg border border-red-500">
+                                <div class="flex items-center">
+                                    <i class="fas fa-exclamation-triangle text-red-400 mr-3"></i>
+                                    <p class="text-red-300 text-sm">Если вам угрожают физической расправой или вызывают "сватов", немедленно звоните в полицию по номеру 102!</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FAQ Section -->
+    <section class="py-20 bg-black bg-opacity-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl md:text-4xl font-bold text-white title-font mb-4">Частые <span class="cyber-text">вопросы</span></h2>
+                <div class="w-20 h-1 bg-gradient-to-r from-cyan-500 to-purple-500 mx-auto mb-6"></div>
+            </div>
+            
+            <div class="max-w-3xl mx-auto space-y-4">
+                <!-- FAQ 1 -->
+                <div class="bg-gray-900 bg-opacity-70 rounded-lg cyber-border overflow-hidden">
+                    <button class="faq-toggle w-full flex justify-between items-center p-6 text-left">
+                        <h3 class="text-lg font-bold text-white">Как быстро вы можете удалить мои данные из интернета?</h3>
+                        <i class="fas fa-chevron-down text-cyan-400 transition-transform duration-300"></i>
+                    </button>
+                    <div class="faq-content px-6 pb-6 hidden">
+                        <p class="text-gray-400">Сроки зависят от конкретной ситуации. В среднем, первичное удаление основных утечек занимает 1-3 дня. Полная очистка всех следов может занять до 2 недель. В экстренных случаях (например, при активном шантаже) мы действуем максимально быстро, часто удаляя информацию в течение нескольких часов.</p>
+                    </div>
+                </div>
+                
+                <!-- FAQ 2 -->
+                <div class="bg-gray-900 bg-opacity-70 rounded-lg cyber-border overflow-hidden">
+                    <button class="faq-toggle w-full flex justify-between items-center p-6 text-left">
+                        <h3 class="text-lg font-bold text-white">Можно ли полностью удалить информацию из интернета?</h3>
+                        <i class="fas fa-chevron-down text-cyan-400 transition-transform duration-300"></i>
+                    </button>
+                    <div class="faq-content px-6 pb-6 hidden">
+                        <p class="text-gray-400">Полное удаление всех следов из интернета невозможно технически, но мы можем удалить информацию из всех значимых и доступных источников, сделать ее труднодоступной для поиска и предотвратить дальнейшие утечки. После нашей работы ваши данные не будут легко находиться через поисковые системы и соцсети.</p>
+                    </div>
+                </div>
+                
+                <!-- FAQ 3 -->
+                <div class="bg-gray-900 bg-opacity-70 rounded-lg cyber-border overflow-hidden">
+                    <button class="faq-toggle w-full flex justify-between items-center p-6 text-left">
+                        <h3 class="text-lg font-bold text-white">Как защититься от сватов?</h3>
+                        <i class="fas fa-chevron-down text-cyan-400 transition-transform duration-300"></i>
+                    </button>
+                    <div class="faq-content px-6 pb-6 hidden">
+                        <p class="text-gray-400">1. Удалите все личные данные из открытых источников (адрес, телефон, места работы)<br>
+                        2. Настройте приватность в соцсетях<br>
+                        3. Используйте VPN и анонимные аккаунты при общении в сети<br>
+                        4. Предупредите местные правоохранительные органы о возможных ложных вызовах<br>
+                        5. Установите камеры видеонаблюдения у входной двери</p>
+                    </div>
+                </div>
+                
+                <!-- FAQ 4 -->
+                <div class="bg-gray-900 bg-opacity-70 rounded-lg cyber-border overflow-hidden">
+                    <button class="faq-toggle w-full flex justify-between items-center p-6 text-left">
+                        <h3 class="text-lg font-bold text-white">Какие гарантии вы предоставляете?</h3>
+                        <i class="fas fa-chevron-down text-cyan-400 transition-transform duration-300"></i>
+                    </button>
+                    <div class="faq-content px-6 pb-6 hidden">
+                        <p class="text-gray-400">Мы гарантируем конфиденциальность и прикладываем все усилия для решения вашей проблемы. Однако из-за природы интернета мы не можем гарантировать 100% удаление всех данных (например, если информация уже сохранена на личных устройствах других людей). В таких случаях мы помогаем с юридическими мерами против распространения.</p>
+                    </div>
+                </div>
+                
+                <!-- FAQ 5 -->
+                <div class="bg-gray-900 bg-opacity-70 rounded-lg cyber-border overflow-hidden">
+                    <button class="faq-toggle w-full flex justify-between items-center p-6 text-left">
+                        <h3 class="text-lg font-bold text-white">Можно ли работать анонимно?</h3>
+                        <i class="fas fa-chevron-down text-cyan-400 transition-transform duration-300"></i>
+                    </button>
+                    <div class="faq-content px-6 pb-6 hidden">
+                        <p class="text-gray-400">Да, мы уважаем право клиентов на анонимность. Вы можете использовать псевдоним и криптовалюту для оплаты. Все данные, которые вы нам предоставляете, защищены и не передаются третьим лицам.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-black bg-opacity-90 py-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div>
+                    <h3 class="text-xl font-bold text-white title-font mb-4">Cyber<span class="cyber-text">Shield</span></h3>
+                    <p class="text-gray-400">Профессиональная защита от доксинга, сватов и киберпреследования.</p>
+                </div>
+                
+                <div>
+                    <h4 class="text-lg font-bold text-white mb-4">Услуги</h4>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-gray-400 hover:text-cyan-400 transition duration-300">Удаление данных</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-cyan-400 transition duration-300">Защита от доксинга</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-cyan-400 transition duration-300">Борьба со сватами</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-cyan-400 transition duration-300">Цифровая гигиена</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h4 class="text-lg font-bold text-white mb-4">Контакты</h4>
+                    <ul class="space-y-2">
+                        <li class="flex items-center">
+                            <i class="fab fa-telegram text-cyan-400 mr-2"></i>
+                            <span class="text-gray-400">@Vklavinov</span>
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fas fa-envelope text-cyan-400 mr-2"></i>
+                            <span class="text-gray-400">contactLavinov@mail.ru</span>
+                        </li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h4 class="text-lg font-bold text-white mb-4">Безопасность</h4>
+                    <p class="text-gray-400 mb-4">Ваши данные защищены.</p>
+                    <div class="flex space-x-4">
+                        <a href="#" class="text-gray-400 hover:text-white">
+                            <i class="fab fa-telegram text-xl"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-white">
+                            <i class="fab fa-signal text-xl"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-white">
+                            <i class="fas fa-lock text-xl"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="border-t border-gray-800 mt-10 pt-6 flex flex-col md:flex-row justify-between items-center">
+                <p class="text-gray-400 text-sm">© 2023 CyberShield. Все права защищены.</p>
+                <div class="flex space-x-6 mt-4 md:mt-0">
+                    <a href="#" class="text-gray-400 hover:text-cyan-400 text-sm transition duration-300">Политика конфиденциальности</a>
+                    <a href="#" class="text-gray-400 hover:text-cyan-400 text-sm transition duration-300">Условия использования</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Floating Button -->
+    <a href="#contact" class="floating-btn bg-gradient-to-r from-cyan-500 to-purple-600 text-white p-4 rounded-full shadow-lg hover:from-cyan-600 hover:to-purple-700 transition duration-300">
+        <i class="fas fa-shield-alt text-xl"></i>
+    </a>
+
+    <!-- Back to Top Button -->
+    <button id="back-to-top" class="hidden fixed bottom-20 right-5 bg-cyan-900 bg-opacity-80 text-white p-3 rounded-full shadow-lg hover:bg-opacity-100 transition duration-300">
+        <i class="fas fa-arrow-up"></i>
+    </button>
+
+    <!-- Emergency Modal -->
+    <div id="emergency-modal" class="hidden fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 p-4">
+        <div class="bg-gray-900 rounded-lg max-w-md w-full border border-red-500">
+            <div class="flex justify-between items-center border-b border-red-500 p-4">
+                <h3 class="text-xl font-bold text-white"><i class="fas fa-exclamation-triangle text-red-400 mr-2"></i> Экстренная ситуация</h3>
+                <button id="close-emergency" class="text-gray-400 hover:text-white">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="p-4">
+                <p class="text-gray-300 mb-4">Если ваши данные уже опубликованы и вам угрожают:</p>
+                <ol class="list-decimal list-inside text-gray-300 space-y-2 mb-6">
+                    <li>Сохраните все доказательства (скриншоты, записи разговоров)</li>
+                    <li>Не вступайте в переговоры с шантажистами</li>
+                    <li>Немедленно свяжитесь со мной через Telegram</li>
+                    <li>При угрозах физической расправе звоните 102</li>
+                </ol>
+                <div class="text-center">
+                    <a href="https://t.me/cybershield_protection" class="inline-block bg-red-600 text-white font-bold py-2 px-6 rounded hover:bg-red-700 transition duration-300">
+                        <i class="fab fa-telegram mr-2"></i> Срочная помощь
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Mobile menu toggle
+        document.getElementById('mobile-menu-button').addEventListener('click', function() {
+            document.getElementById('mobile-menu').classList.toggle('hidden');
+        });
+
+        // Back to top button
+        window.addEventListener('scroll', function() {
+            var backToTopButton = document.getElementById('back-to-top');
+            if (window.pageYOffset > 300) {
+                backToTopButton.classList.remove('hidden');
+            } else {
+                backToTopButton.classList.add('hidden');
+            }
+        });
+
+        document.getElementById('back-to-top').addEventListener('click', function() {
+            window.scrollTo({top: 0, behavior: 'smooth'});
+        });
+
+        // Smooth scrolling for navigation links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+                
+                // Close mobile menu if open
+                document.getElementById('mobile-menu').classList.add('hidden');
+            });
+        });
+
+        // FAQ toggle
+        document.querySelectorAll('.faq-toggle').forEach(button => {
+            button.addEventListener('click', function() {
+                const content = this.nextElementSibling;
+                const icon = this.querySelector('i');
+                
+                content.classList.toggle('hidden');
+                icon.classList.toggle('fa-chevron-down');
+                icon.classList.toggle('fa-chevron-up');
+            });
+        });
+
+        // Contact method toggle
+        document.getElementById('contact-method').addEventListener('change', function() {
+            const detailsField = document.getElementById('contact-details');
+            if (this.value) {
+                detailsField.classList.remove('hidden');
+            } else {
+                detailsField.classList.add('hidden');
+            }
+        });
+
+        // Matrix background animation
+        function createMatrixBackground() {
+            const container = document.getElementById('matrix-bg');
+            const chars = "01アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン";
+            
+            for (let i = 0; i < 50; i++) {
+                const column = document.createElement('div');
+                column.className = 'matrix-column';
+                column.style.left = `${i * 2}%`;
+                
+                // Create random delay for each column
+                const delay = Math.random() * 10;
+                column.style.setProperty('--delay', delay);
+                
+                // Create random characters
+                const charCount = 30 + Math.floor(Math.random() * 20);
+                for (let j = 0; j < charCount; j++) {
+                    const char = document.createElement('div');
+                    char.className = 'matrix-char';
+                    char.textContent = chars[Math.floor(Math.random() * chars.length)];
+                    char.style.animationDelay = `${j * 0.2 + delay}s`;
+                    char.style.opacity = Math.random();
+                    column.appendChild(char);
+                }
+                
+                container.appendChild(column);
+            }
+        }
+
+        // Initialize matrix background on load
+        window.addEventListener('load', createMatrixBackground);
+
+        // Emergency button
+        document.getElementById('emergency-btn').addEventListener('click', function() {
+            document.getElementById('emergency-modal').classList.remove('hidden');
+        });
+
+        document.getElementById('close-emergency').addEventListener('click', function() {
+            document.getElementById('emergency-modal').classList.add('hidden');
+        });
+
+        // Form submission
+        document.querySelector('form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            alert('Ваша заявка принята. Я свяжусь с вами в ближайшее время через указанный способ связи.');
+            this.reset();
+            document.getElementById('contact-details').classList.add('hidden');
+        });
+    </script>
+</body>
+</html>
